@@ -106,6 +106,8 @@ public class Model extends Observable {
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
      * */
+
+
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
@@ -113,6 +115,32 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+
+        /**
+         * only move up
+         */
+        // move all movable tile to the right position
+        int tMoved = 0;
+
+        for (int r = size() - 1; r >= 0; r = r - 1) { //iterate each row
+            for (int i = 0; i < size(); i = i + 1) { //iterate the row for every col
+                if (tile(i, r) == null) { //check if any of the tile in the last row is empty
+                    for (int j = r - 1; j >= 0; j = j - 1) { //iterate the empty tile's column
+                        if (tile(i, j) != null) { // find the first tile that is not empty
+                            Tile t = board.tile(i, j);
+                            board.move(i, r - tMoved, t); //move the tile to the last row
+                            tMoved = tMoved + 1;
+                        }
+                    }
+                    tMoved = 0;
+                }
+            }
+
+        }
+        changed = true;
+
+
+
 
         checkGameOver();
         if (changed) {
@@ -176,7 +204,7 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        
+
         if (emptySpaceExists(b)) {
             return true;
         }
