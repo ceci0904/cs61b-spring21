@@ -107,6 +107,47 @@ public class Model extends Observable {
      *    and the trailing tile does not.
      * */
 
+    public Tile findNextOccupiedRow (int c, int r) {
+        for (int i = r - 1; i >= 0; i = i - 1) {
+            if (tile(c, i) != null) {
+                Tile tN = board.tile(c, i);
+                return tN;
+            }
+        }
+        Tile o = null;
+        return o;
+    }
+
+    public void mergeTwoTiles (Tile t) {
+        if (findNextOccupiedRow(t.col(), t.row()) == null) {
+            System.out.println("empty col");
+            return;
+        } else { //if there is a tile below
+            Tile nT = findNextOccupiedRow(t.col(), t.row());
+            if (t.value() == nT.value()) { //if the tile below t has the same value
+                board.move(t.col(), t.row(), nT); //move nT to t's position
+                System.out.println("merged");
+            } else {
+                System.out.println("not a merge");
+                return;
+            }
+        }
+
+    }
+    //return the row of the nearest empty space, return -1 when there is no empty space above
+    public int findEmptyRowAbove (int c, int r) {
+        if (r >= size() - 1) {
+            return -1;
+        }
+        while (r < size() - 1 && board.tile(c, r + 1) == null) {
+            r = r + 1;
+        }
+        return r;
+    }
+
+    public void  moveUp (int c, int r) {
+
+    }
 
     public boolean tilt(Side side) {
         boolean changed;
@@ -119,25 +160,100 @@ public class Model extends Observable {
         /**
          * only move up
          */
-        // move all movable tile to the right position
-        int tMoved = 0;
+        for (int c = 0; c < size(); c = c + 1) { //iterate from upper left tile
+            int r = size() - 1;
 
-        for (int r = size() - 1; r >= 0; r = r - 1) { //iterate each row
-            for (int i = 0; i < size(); i = i + 1) { //iterate the row for every col
-                if (tile(i, r) == null) { //check if any of the tile in the last row is empty
-                    for (int j = r - 1; j >= 0; j = j - 1) { //iterate the empty tile's column
-                        if (tile(i, j) != null) { // find the first tile that is not empty
-                            Tile t = board.tile(i, j);
-                            board.move(i, r - tMoved, t); //move the tile to the last row
-                            tMoved = tMoved + 1;
+            while (r >= 0) {
+                if (board.tile(c, r) == null) { //if the last tile is empty
+                    if (findNextOccupiedRow(c, r) == null) { //find next occupied tile
+                        break;
+                    } else {
+                        Tile t = findNextOccupiedRow(c, r); //the first occupied tile in this col
+//
+                        int aR = findEmptyRowAbove(t.col(), t.row());
+                        if (aR != -1) {
+                            board.move(c, aR, t); //move merged tiles to top
                         }
+                        r = t.row() - 1;
                     }
-                    tMoved = 0;
+                } else {
+
+                    Tile t = board.tile(c, r);
+                    mergeTwoTiles(t);
+
+                    int aR = findEmptyRowAbove(t.col(), t.row());
+                    if (aR != -1) {
+                        board.move(c, aR, t); //move merged tiles to top
+                    }
+                    r = t.row() - 1;
+
                 }
             }
 
         }
+
         changed = true;
+
+        //while findNextO is not null
+        //1.fi
+
+        //if it's null
+        //find the nearest tile below it
+        //check merge
+        //if it's not null
+        //check merge
+        //
+
+//        for (int r = size() - 1; r > 0; r = r - 1) {//iterate every row
+//            for (int c = 0; c < size(); c = c + 1) {//iterate every col in the row
+//                if (tile(c, r) != null) { //find the first occupied tile
+//                    Tile t = board.tile(c, r);
+//                    mergeTwoTiles(t); //merge all merge move in the col
+//                    changed = true;
+//                }
+
+
+
+
+
+
+
+
+//                if (findNextOccupiedRow(c, r) != null) {
+//                    Tile t = findNextOccupiedRow(c, r); /* find the nearest occupied tile */
+//                    if (tile(c, r) == null) { // if the row if empty
+//                        Tile tN = findNextOccupiedRow(t.col(), t.row());
+//                        if (tN.value() == t.value()) {
+//                            board.move(c, r, t);
+//                            board.move(c, r, tN);
+//                        }
+//                    }
+//                    if (t.value() == tile(c, r).value()) { //if the first row is empty, or the nearest tile has the same value
+//                        board.move(c, r, t); //move the nearest tile to the row
+//                        changed = true;
+//                    } else {
+//                        int d = r - t.row();
+//                        if (d > 1) {
+//                            board.move(c, (r - d) + 1, t);
+//                            changed = true;
+//                        }
+//
+//                    }
+//                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
